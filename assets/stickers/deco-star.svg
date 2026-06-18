@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="Sparkle star doodle">
+  <title>deco-star</title>
+  <!-- four-point sparkle (concave star) — the "Aha!" twinkle -->
+  <path d="M48 8 C52 30 66 44 88 48 C66 52 52 66 48 88 C44 66 30 52 8 48 C30 44 44 30 48 8 Z"
+        fill="#F59A2C" stroke="#15171A" stroke-width="3" stroke-linejoin="round"/>
+  <!-- tiny secondary spark -->
+  <path d="M80 16 C81 22 84 25 90 26 C84 27 81 30 80 36 C79 30 76 27 70 26 C76 25 79 22 80 16 Z" fill="#105194"/>
+</svg>

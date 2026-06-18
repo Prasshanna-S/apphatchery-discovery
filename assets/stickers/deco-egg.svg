@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Hatching egg doodle">
+  <title>deco-egg — hatchery motif</title>
+  <!-- cracked egg: bottom shell + jagged hatch line + little yolk peeking out -->
+  <g fill="none" stroke="#105194" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- lower shell -->
+    <path d="M30 64 C26 86 42 100 60 100 C78 100 94 86 90 64"/>
+    <!-- upper shell, lifted/tilted as if just hatched -->
+    <path d="M33 58 C30 36 44 20 60 20 C76 20 90 36 87 56" transform="rotate(-7 60 40)"/>
+  </g>
+  <!-- jagged crack line -->
+  <path d="M28 61 L40 55 L48 63 L58 54 L67 63 L76 55 L92 61" fill="none" stroke="#105194" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- yolk peeking -->
+  <circle cx="60" cy="60" r="9" fill="#F59A2C"/>
+  <!-- two sparkle dashes -->
+  <path d="M99 30 l7 -7 M104 36 l9 -3" stroke="#F59A2C" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

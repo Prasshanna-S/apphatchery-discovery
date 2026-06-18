@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="220" height="220" role="img" aria-label="Pediatric Blood &amp; Cancer 2023 — HomeTown">
+  <title>Pediatric Blood &amp; Cancer 2023 — HomeTown — PAPER sticker</title>
+  <defs>
+    <filter id="ds" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0B2440" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#ds)">
+    <rect x="22" y="22" width="176" height="176" rx="22" fill="#FFFFFF"/>
+    <rect x="29" y="29" width="162" height="162" rx="16" fill="#F4F2EC"/>
+    <rect x="29" y="29" width="162" height="162" rx="16" fill="none" stroke="#F59A2C" stroke-width="2" opacity="0.30"/>
+    <!-- stacked-paper glyph, top-right -->
+    <g transform="translate(150,34)">
+      <rect x="6" y="6" width="34" height="26" rx="4" fill="#F59A2C" opacity="0.18"/>
+      <rect x="0" y="0" width="34" height="26" rx="4" fill="none" stroke="#105194" stroke-width="3"/>
+      <line x1="7" y1="9" x2="27" y2="9" stroke="#105194" stroke-width="2.4"/>
+      <line x1="7" y1="15" x2="27" y2="15" stroke="#105194" stroke-width="2.4"/>
+      <line x1="7" y1="21" x2="20" y2="21" stroke="#105194" stroke-width="2.4"/>
+    </g>
+    <text x="26" y="42" font-family="'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace" font-size="11" font-weight="600" letter-spacing="1.2" fill="#105194">[PAPER]</text>
+    <!-- venue (hero) -->
+    <text text-anchor="middle" font-family="'Geist','Geist Placeholder',system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="15" font-weight="700" letter-spacing="-0.4" fill="#105194"><tspan x="110" y="80">Pediatric Blood</tspan><tspan x="110" y="99">&amp; Cancer</tspan></text>
+    <!-- year pill -->
+    <g transform="translate(85,108)">
+      <rect x="0" y="0" width="50" height="19" rx="9.5" fill="#105194"/>
+      <text x="25" y="13.5" text-anchor="middle" font-family="'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace" font-size="11" font-weight="700" letter-spacing="1.5" fill="#F4F2EC">2023</text>
+    </g>
+    <!-- topic subtitle -->
+    <text text-anchor="middle" font-family="'Geist','Geist Placeholder',system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="11.5" font-weight="500" letter-spacing="-0.1" fill="#15171A" opacity="0.78"><tspan x="110" y="147">HomeTown cancer</tspan><tspan x="110" y="163">surveillance</tspan></text>
+    <!-- PAPER tag, bottom-left -->
+    <g transform="translate(26,172)">
+      <rect x="0" y="0" width="62" height="18" rx="6" fill="#F59A2C"/>
+      <text x="31" y="13" text-anchor="middle" font-family="'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace" font-size="10.5" font-weight="700" letter-spacing="1.3" fill="#15171A">PAPER</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="220" height="220" role="img" aria-label="AppHatchery news">
+  <title>AppHatchery news — NEWS sticker</title>
+  <defs>
+    <filter id="ds" x="-25%" y="-25%" width="150%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#0B2440" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#ds)">
+    <rect x="22" y="22" width="176" height="176" rx="22" fill="#FFFFFF"/><rect x="29" y="29" width="162" height="162" rx="16" fill="#F4F2EC"/><rect x="29" y="29" width="162" height="162" rx="16" fill="none" stroke="#F59A2C" stroke-width="2" opacity="0.30"/>
+    <g transform="translate(162,48)" fill="none" stroke="#F59A2C" stroke-width="3.5" stroke-linecap="round"><circle r="4" fill="#F59A2C" stroke="none"/><path d="M 8 -8 A 11 11 0 0 1 8 8"/><path d="M 14 -14 A 19 19 0 0 1 14 14"/></g>
+    <text x="26" y="42" font-family="'Geist Mono',ui-monospace,'SF Mono',Menlo,monospace" font-size="11" font-weight="600" letter-spacing="1.2" fill="#105194">[NEWS]</text>
+    
+    <text text-anchor="middle" font-family="'Geist','Geist Placeholder',system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="18" font-weight="700" letter-spacing="-0.4" fill="#15171A"><tspan x="110" y="128.0">AppHatchery news</tspan></text>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" width="180" height="60" role="img" aria-label="Hand-drawn connector squiggle">
+  <title>deco-squiggle — connector</title>
+  <!-- loose hand-drawn connecting line -->
+  <path d="M8 38 C30 8 48 8 62 30 C74 48 92 50 108 30 C122 12 142 14 158 34"
+        fill="none" stroke="#105194" stroke-width="5" stroke-linecap="round"/>
+  <!-- little orange end-dot -->
+  <circle cx="158" cy="34" r="6.5" fill="#F59A2C"/>
+  <circle cx="8" cy="38" r="4.5" fill="#105194"/>
+</svg>

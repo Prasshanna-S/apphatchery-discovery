@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110" width="120" height="110" role="img" aria-label="Organic blob doodle">
+  <title>deco-blob</title>
+  <!-- soft organic blob (Fabla-mascot family feel) -->
+  <path d="M60 8 C84 6 108 22 110 48 C112 72 98 92 74 100 C52 107 26 102 14 82 C2 62 6 34 26 18 C36 10 48 9 60 8 Z"
+        fill="#105194"/>
+  <!-- highlight -->
+  <ellipse cx="44" cy="38" rx="14" ry="10" fill="#FFFFFF" opacity="0.20"/>
+  <!-- two friendly dot-eyes + orange cheek -->
+  <circle cx="48" cy="54" r="5.5" fill="#FFFFFF"/>
+  <circle cx="74" cy="54" r="5.5" fill="#FFFFFF"/>
+  <circle cx="61" cy="72" r="6" fill="#F59A2C" opacity="0.85"/>
+</svg>
