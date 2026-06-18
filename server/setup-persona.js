@@ -6,6 +6,7 @@
  *
  * Run:  TAVUS_API_KEY=... npm run setup:persona
  */
+import "./env.js";
 import { ARTIFACTS, ORG } from "../shared/content.js";
 
 const BASE = "https://tavusapi.com";

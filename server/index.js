@@ -9,6 +9,7 @@
  * Run:  TAVUS_API_KEY=... TAVUS_PERSONA_ID=... node server/index.js
  * Without a key it still serves the app — the front-end falls back to the chip survey.
  */
+import "./env.js";
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";

@@ -186,13 +186,15 @@ function renderIntro() {
   consoleEl.innerHTML = `
     <span class="mono-label">Welcome to AppHatchery</span>
     <h1 class="qbig">Let's find what<br>you're <span class="kw">curious</span> about.</h1>
-    <p class="qhelp">Drag to wander what we've built — or answer a few quick questions and we'll guide you to the right tool, study, or straight to the team.</p>
+    <p class="qhelp">Drag to wander what we've built — or answer two quick questions and we'll point you to the right tool, study, or straight to the team.</p>
     <div class="chips">
       <button class="chip chip--go" id="beginBtn">Guide me <span aria-hidden="true">→</span></button>
       <button class="chip" id="browseBtn">Just browsing</button>
-    </div>`;
+    </div>
+    <button class="ghostlink intro-contact" id="introContact">or just talk to us →</button>`;
   consoleEl.querySelector("#beginBtn").addEventListener("click", () => { enterFocused(); goToStep(0); });
   consoleEl.querySelector("#browseBtn").addEventListener("click", () => toggleSimplified(true));
+  consoleEl.querySelector("#introContact").addEventListener("click", openContact);
   announce("AppHatchery discovery. Drag to explore, or let us guide you.");
 }
 function renderQuestion(i) {
@@ -274,6 +276,7 @@ function discoveryBits() {
   const area = state.answers.area ? (PROBLEM_AREAS[state.answers.area] || null) : null;
   return [who, area].filter(Boolean);
 }
+function openContact() { document.body.classList.remove("q-explore"); enterFocused(); renderHandoff(); }
 function renderHandoff() {
   consoleEl.className = "console console--intake";
   const bits = discoveryBits();
@@ -302,7 +305,7 @@ function renderHandoff() {
     </div>
     <button class="ghostlink" id="hoBack">← back to results</button>`;
   consoleEl.querySelector("#hoVideo").addEventListener("click", startTavus);
-  consoleEl.querySelector("#hoChips").addEventListener("click", () => { state.intake = {}; renderIntakeQuestion(0); });
+  consoleEl.querySelector("#hoChips").addEventListener("click", () => { state.intake = {}; renderIntakeDetails(); });
   consoleEl.querySelector("#hoBack").addEventListener("click", renderResult);
 }
 async function startTavus() {
@@ -404,9 +407,17 @@ function renderIntakeQuestion(i) {
 function renderIntakeDetails() {
   consoleEl.className = "console console--intake";
   consoleEl.innerHTML = `
-    <span class="mono-label">Almost there</span>
-    <h2 class="qbig">Where do we <span class="kw">reach you</span>?</h2>
-    <p class="qhelp">Optional — leave an email and we'll follow up. You'll get a confirmation either way.</p>
+    <span class="mono-label">One quick step</span>
+    <h2 class="qbig">Tell us where to <span class="kw">reach you</span>.</h2>
+    <p class="qhelp">All optional — leave an email and we'll follow up, or just send it across. You'll get a confirmation either way.</p>
+    <div class="intake-stage">
+      <span class="mono-label">Where are you with it?</span>
+      <div class="chips chips--inline">
+        <button class="chip chip--mini" data-stage="idea">Just an idea</button>
+        <button class="chip chip--mini" data-stage="funded">Funded</button>
+        <button class="chip chip--mini" data-stage="in_progress">Underway</button>
+      </div>
+    </div>
     <div class="intake-form">
       <input class="field" id="iName" type="text" placeholder="Name (optional)" autocomplete="name" />
       <input class="field" id="iEmail" type="email" placeholder="Email (optional)" autocomplete="email" />
@@ -416,8 +427,13 @@ function renderIntakeDetails() {
       <button class="chip chip--go" id="iSend">Send to the team →</button>
       <button class="ghostlink" id="iBack2">← back</button>
     </div>`;
+  consoleEl.querySelectorAll(".chip--mini").forEach(c => c.addEventListener("click", () => {
+    const on = c.classList.contains("is-sel");
+    consoleEl.querySelectorAll(".chip--mini").forEach(x => x.classList.remove("is-sel"));
+    if (!on) { c.classList.add("is-sel"); state.intake.stage = c.dataset.stage; } else { delete state.intake.stage; }
+  }));
   consoleEl.querySelector("#iSend").addEventListener("click", submitIntake);
-  consoleEl.querySelector("#iBack2").addEventListener("click", () => renderIntakeQuestion(INTAKE_QUESTIONS.length - 1));
+  consoleEl.querySelector("#iBack2").addEventListener("click", renderHandoff);
 }
 async function submitIntake() {
   const r = rank(state.answers, { limit: 6 });
@@ -477,10 +493,11 @@ function renderPipeline() {
       <svg class="pipe-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2z"/></svg>
       <div class="pipe-body"><span class="pipe-sub mono-label">Have an idea?</span><strong>Start a project</strong></div>
       <div class="pipe-actions">
-        <a class="pipe-go" href="${PIPELINE.primaryCta.url}" target="_blank" rel="noopener">Contact us →</a>
+        <button class="pipe-go" id="pipeStart" type="button">Talk to us →</button>
         <a class="pipe-mail" href="mailto:${PIPELINE.email}">${escapeHtml(PIPELINE.email)}</a>
       </div>
     </div>`;
+  pipeEl.querySelector("#pipeStart").addEventListener("click", openContact);
   if (gsap && !reduced) gsap.from(pipeEl, { y: 90, autoAlpha: 0, duration: 0.9, ease: "back.out(1.6)", delay: 0.7 });
 }
 function buildSimplified() {

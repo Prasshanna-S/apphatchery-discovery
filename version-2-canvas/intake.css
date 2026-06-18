@@ -54,3 +54,12 @@ textarea.field { resize: vertical; min-height: 56px; }
 @media (max-width: 760px) {
   .tavus__panel { width: 96vw; aspect-ratio: auto; height: 80vh; }
 }
+
+/* refined flow — instant-contact button, inline stage chips, intro shortcut */
+.pipe-go { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-align: left; }
+.intro-contact { display: inline-block; margin-top: 14px; }
+.intake-stage { margin: 0 0 14px; }
+.intake-stage > .mono-label { display: block; margin-bottom: 8px; }
+.chips--inline { gap: 8px; }
+.chip--mini { min-height: 40px; padding: 0 14px; font-size: .92rem; }
+.chip--mini.is-sel { background: var(--ink); color: var(--paper); border-color: var(--ink); }

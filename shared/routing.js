@@ -28,34 +28,11 @@ export const QUESTIONS = [
     ]
   },
   {
-    id: "who",
-    prompt: "Which sounds most like you?",
-    help: "This tailors what we show you.",
-    options: [
-      { id: "researcher",   label: AUDIENCES.researcher.label },
-      { id: "clinician",    label: AUDIENCES.clinician.label },
-      { id: "caregiver",    label: AUDIENCES.caregiver.label },
-      { id: "publicHealth", label: AUDIENCES.publicHealth.label }
-    ]
-  },
-  {
     id: "area",
     prompt: "What's it about?",
     help: "Choose the closest area.",
     // options are generated dynamically from the artifacts each audience can actually use
     dynamic: true
-  },
-  {
-    id: "need",
-    prompt: "And what would help most?",
-    help: "Last one — this points you to the right thing.",
-    options: [
-      { id: "app",       label: "A ready-to-use app",   hint: "Something you can pick up today" },
-      { id: "reference", label: "A quick reference",    hint: "Look something up fast" },
-      { id: "studyTool", label: "A tool for a study",   hint: "Collect data or run a protocol" },
-      { id: "evidence",  label: "The research behind it", hint: "Papers and validation" },
-      { id: "talk",      label: "To talk it through",   hint: "I have an idea or a question" }
-    ]
   }
 ];
 
