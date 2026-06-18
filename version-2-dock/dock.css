@@ -82,13 +82,24 @@ html.reduce-motion .mdock__live, html.reduce-motion .live-dot { animation: none;
 
 /* ---------- persistent top intro + home/in-mode visibility ---------- */
 .intro-banner {
-  position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 30; max-width: 540px; text-align: center;
-  padding: 12px 22px; background: rgba(255,255,255,.74); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--line-2, #e4e1d8); border-radius: 16px; box-shadow: 0 8px 26px rgba(16,38,64,.09); transition: opacity .3s, transform .3s;
+  position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 30; max-width: 600px;
+  display: flex; align-items: center; gap: 15px; text-align: left; padding: 13px 24px 13px 18px;
+  background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(241,239,232,.8));
+  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(255,255,255,.8); border-radius: 18px;
+  box-shadow: 0 12px 32px rgba(16,38,64,.13), inset 0 1px 0 rgba(255,255,255,.9);
+  transition: opacity .3s, transform .3s; animation: bannerIn .65s cubic-bezier(.2,.8,.3,1) both;
 }
-.intro-banner__eyebrow { display: block; margin-bottom: 5px; }
-.intro-banner__txt { margin: 0; font-size: .95rem; line-height: 1.45; color: var(--ink, #16181c); }
+.intro-banner::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--accent, #105194), var(--warm, #f59a2c)); }
+.intro-banner__egg { width: 48px; height: 48px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(16,38,64,.2)); animation: eggBob 3.6s ease-in-out infinite; transform-origin: center bottom; }
+.intro-banner__body { display: flex; flex-direction: column; }
+.intro-banner__eyebrow { align-self: flex-start; margin-bottom: 6px; padding: 3px 10px; border-radius: 20px; background: rgba(16,81,148,.1); color: var(--accent, #105194); }
+.intro-banner__txt { margin: 0; font-size: .96rem; line-height: 1.45; color: var(--ink, #16181c); }
 .intro-banner__txt strong { font-family: var(--font-display, Georgia, serif); font-weight: 700; }
+.intro-banner__txt .kw { color: var(--accent, #105194); }
+@keyframes bannerIn { from { opacity: 0; top: 56px; } to { opacity: 1; top: 72px; } }
+@keyframes eggBob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-5px) rotate(3deg); } }
+html.reduce-motion .intro-banner, html.reduce-motion .intro-banner__egg { animation: none; }
 /* centre console is hidden at home, shown only inside a mode */
 .console { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility .3s; }
 body.in-mode .console { opacity: 1; visibility: visible; pointer-events: auto; }
