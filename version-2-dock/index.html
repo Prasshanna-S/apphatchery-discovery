@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>AppHatchery — Find your way in</title>
+  <meta name="description" content="Tell us what you're working on, and we'll point you to the right AppHatchery tool, study, or the team itself." />
+
+  <!-- Type: Fraunces (display — serious + a little playful), Geist (UI), Geist Mono (labels), Inter (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700;800;900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="../shared/tokens.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="intake.css?v=1" />
+  <link rel="stylesheet" href="dock.css?v=1" />
+
+  <!-- GSAP 3.13 (all plugins free) — UMD globals, ready before the module runs -->
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/InertiaPlugin.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#console">Skip to the guide</a>
+
+  <main class="experience" id="experience">
+    <!-- INFINITE BOARD: a seamlessly-tiling, drag-anywhere field of logo stickers.
+         Decorative visual layer; the accessible equivalent is #simplified + the detail dialog. -->
+    <div class="world-viewport" id="viewport">
+      <div class="world" id="world" aria-hidden="true"></div>
+    </div>
+
+    <!-- FIXED STAGE over the board -->
+    <div class="stage">
+      <header class="topbar">
+        <a class="topbar__back" id="backLink" href="https://apphatchery.org">
+          <span aria-hidden="true">←</span> Back
+        </a>
+        <a class="brandmark" href="https://apphatchery.org" target="_blank" rel="noopener">
+          <span class="brandmark__egg" aria-hidden="true"></span>
+          AppHatchery
+        </a>
+        <span class="topbar__hint" id="dragHint" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 2 9 5h2v6H5V9l-3 3 3 3v-2h6v6H9l3 3 3-3h-2v-6h6v2l3-3-3-3v2h-6V5h2z"/></svg>
+          Drag anywhere — it goes on
+        </span>
+      </header>
+
+      <!-- THE CONSOLE: the guided discovery flow. Light card. Injected by canvas.js -->
+      <section class="console" id="console" aria-label="Discovery guide"></section>
+
+      <!-- ALWAYS-ON PIPELINE: never disperses -->
+      <aside class="pipeline-anchor" id="pipeline" aria-label="Contact AppHatchery"></aside>
+
+      <!-- macOS-style DOCK (built by canvas.js) -->
+      <nav class="mdock" id="dock" aria-label="AppHatchery navigation"></nav>
+    </div>
+
+    <!-- ARTIFACT DETAIL — opened by clicking a sticker (page-level open) -->
+    <div class="detail" id="detail" hidden role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="detail__backdrop" data-close></div>
+      <div class="detail__panel" role="document"></div>
+    </div>
+
+    <!-- ACCESSIBLE PARALLEL VIEW -->
+    <section class="simplified" id="simplified" hidden aria-label="All AppHatchery tools, as a list"></section>
+
+    <div class="sr-only" role="status" aria-live="polite" id="live"></div>
+  </main>
+
+  <script type="module" src="canvas.js"></script>
+  <noscript>
+    <p style="padding:2rem;max-width:60ch;margin:auto;font-size:1.125rem">
+      This guided board needs JavaScript. You can still reach everything AppHatchery makes at
+      <a href="https://apphatchery.org">apphatchery.org</a>, or email
+      <a href="mailto:info@apphatchery.org">info@apphatchery.org</a>.
+    </p>
+  </noscript>
+</body>
+</html>

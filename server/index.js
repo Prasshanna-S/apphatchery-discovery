@@ -14,12 +14,15 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createConversation } from "./tavus.js";
+import { createConversation, endConversation } from "./tavus.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const PORT = process.env.PORT || 8000;
 const leads = [];   // POC store — swap for Notion/Airtable (brief §10 decision)
+const DATA_DIR = path.join(__dirname, "data");
+try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (_) {}
+function saveDoc(prefix, obj) { try { const f = path.join(DATA_DIR, `${prefix}-${Date.now()}.json`); fs.writeFileSync(f, JSON.stringify(obj, null, 2)); console.log("[saved]", path.basename(f)); return f; } catch (_) { return null; } }
 
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml", ".ico": "image/x-icon", ".webp": "image/webp", ".woff2": "font/woff2" };
 
@@ -39,15 +42,21 @@ const server = http.createServer(async (req, res) => {
     try {
       const b = JSON.parse(await readBody(req) || "{}");
       console.log("[tavus webhook]", b.event_type || "?");
-      // TODO (Phase 3): on application.transcription_ready → synthesize report (Claude)
-      //       → save to Notion/Airtable → send acknowledgment email → notify team.
-      leads.push({ kind: "tavus", event: b.event_type, conversation_id: b.conversation_id, at: new Date().toISOString(), raw: b });
+      // The FINAL DOCUMENT lands here. (Prod: synthesize w/ Claude → Notion/Airtable → ack email.)
+      if (/transcription_ready|shutdown/.test(b.event_type || "")) {
+        const file = saveDoc("tavus", { conversation_id: b.conversation_id, event: b.event_type, transcript: (b.properties && b.properties.transcript) || null, at: new Date().toISOString() });
+        leads.push({ kind: "tavus", conversation_id: b.conversation_id, file, at: new Date().toISOString() });
+      }
     } catch (_) {}
     return json(res, 200, { ok: true });
   }
-  if (req.method === "POST" && url.pathname === "/api/lead") {       // chip-survey records (optional server save)
-    try { const b = JSON.parse(await readBody(req) || "{}"); leads.push({ kind: "chip", ...b }); console.log("[chip lead]", b.researchArea); } catch (_) {}
+  if (req.method === "POST" && url.pathname === "/api/lead") {       // structured intake records (chip + Tavus capture)
+    try { const b = JSON.parse(await readBody(req) || "{}"); const file = saveDoc("lead", b); leads.push({ kind: "lead", ...b, file }); } catch (_) {}
     return json(res, 200, { ok: true });
+  }
+  if (req.method === "POST" && url.pathname === "/api/end-conversation") {
+    try { const b = JSON.parse(await readBody(req) || "{}"); return json(res, 200, await endConversation(b.conversation_id)); }
+    catch (_) { return json(res, 200, { ok: false }); }
   }
   if (req.method === "GET" && url.pathname === "/api/leads") return json(res, 200, leads);
 

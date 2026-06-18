@@ -45,3 +45,12 @@ export async function createConversation(body) {
   if (!res.ok) throw new Error(`Tavus ${res.status}: ${await res.text()}`);
   return res.json();   // { conversation_id, conversation_url, status, ... }
 }
+
+/* End a conversation cleanly (frees the replica + free-tier minutes). Best-effort. */
+export async function endConversation(conversationId) {
+  if (!conversationId || !process.env.TAVUS_API_KEY) return { ok: false, skipped: true };
+  try {
+    const res = await fetch(`${BASE}/v2/conversations/${conversationId}/end`, { method: "POST", headers: { "x-api-key": process.env.TAVUS_API_KEY } });
+    return { ok: res.ok, status: res.status };
+  } catch (e) { return { ok: false, error: String(e.message || e) }; }
+}

@@ -1,0 +1,81 @@
+/* ============================================================================
+   macOS-style dock + mission card + free-roam state  (version-2-dock)
+   ============================================================================ */
+
+/* ---------- the dock ---------- */
+.mdock { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 40; }
+.mdock__bar {
+  position: relative; display: flex; align-items: flex-end; gap: 10px; padding: 10px 14px;
+  background: rgba(255, 255, 255, .55);
+  backdrop-filter: blur(20px) saturate(1.4); -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, .65); border-radius: 22px;
+  box-shadow: 0 14px 44px rgba(16, 24, 40, .24), inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+.mdock__item {
+  position: relative; flex: 0 0 auto; width: 58px; height: 58px; padding: 0; border: 0; background: none;
+  cursor: pointer; transform-origin: center bottom; transition: transform .14s cubic-bezier(.2, .8, .3, 1);
+}
+.mdock__icon {
+  position: relative; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 16px;
+  background: linear-gradient(160deg, #ffffff, #eceef3); overflow: hidden;
+  box-shadow: 0 2px 7px rgba(16, 24, 40, .2), inset 0 1px 0 rgba(255, 255, 255, .85);
+}
+.mdock__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* real PNG app-icons carry their own squircle + shadow — let them show fully */
+.mdock__item:not(.mdock__item--sys) .mdock__icon { background: transparent; box-shadow: none; overflow: visible; }
+.mdock__item:not(.mdock__item--sys) .mdock__img { object-fit: contain; }
+.mdock__glyph { width: 27px; height: 27px; color: var(--ink, #16181c); }
+.mdock__item--sys .mdock__icon { background: linear-gradient(160deg, #f4f2ec, #e6e3da); }
+.mdock__item--sys .mdock__glyph { width: 22px; height: 22px; color: var(--mute, #6b7180); }
+.mdock__item.is-on .mdock__glyph { color: var(--accent, #105194); }
+
+/* active dot */
+.mdock__dot {
+  position: absolute; left: 50%; bottom: -7px; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--ink, #16181c); transform: translateX(-50%); opacity: 0; transition: opacity .2s;
+}
+.mdock__item.is-active .mdock__dot { opacity: .9; }
+
+/* tooltip */
+.mdock__tip {
+  position: absolute; left: 50%; bottom: calc(100% + 12px); transform: translateX(-50%) translateY(5px);
+  white-space: nowrap; background: var(--ink, #16181c); color: var(--paper, #f1efe8);
+  font-family: "Geist Mono", ui-monospace, monospace; font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
+  padding: 5px 9px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity .16s, transform .16s;
+  box-shadow: 0 6px 16px rgba(16, 24, 40, .28);
+}
+.mdock__tip::after {
+  content: ""; position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: var(--ink, #16181c);
+}
+.mdock__item:hover .mdock__tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.mdock__sep { align-self: center; width: 1px; height: 30px; margin: 0 4px; background: rgba(16, 24, 40, .16); }
+
+/* ---------- mission / welcome card ---------- */
+.console--welcome .welcome-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 20px; }
+.welcome-hint { font-family: "Geist Mono", ui-monospace, monospace; font-size: .8rem; color: var(--mute, #6b7180); }
+
+/* ---------- free-roam: console dismissed ---------- */
+body.roam .console { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s ease, visibility .3s ease; }
+
+/* ---------- live "available now" presence ---------- */
+.mdock__live {
+  position: absolute; top: 1px; right: 1px; width: 12px; height: 12px; border-radius: 50%;
+  background: #22c55e; border: 2px solid #fff; z-index: 2; animation: livePulse 2s infinite;
+}
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, .55); }
+  70% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+.handoff__live { display: inline-flex !important; align-items: center; gap: 6px; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex: 0 0 auto; animation: livePulse 2s infinite; }
+.handoff__opt--video .handoff__live { color: #b9f6c8; }
+html.reduce-motion .mdock__live, html.reduce-motion .live-dot { animation: none; }
+
+@media (max-width: 760px) {
+  .mdock { bottom: 12px; }
+  .mdock__item, .mdock__icon { width: 50px; height: 50px; }
+  .mdock__bar { gap: 7px; padding: 8px 10px; }
+}
