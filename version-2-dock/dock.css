@@ -82,24 +82,21 @@ html.reduce-motion .mdock__live, html.reduce-motion .live-dot { animation: none;
 
 /* ---------- persistent top intro + home/in-mode visibility ---------- */
 .intro-banner {
-  position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 30; max-width: 600px;
-  display: flex; align-items: center; gap: 15px; text-align: left; padding: 13px 24px 13px 18px;
-  background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(241,239,232,.8));
-  backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  border: 1px solid rgba(255,255,255,.8); border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(16,38,64,.13), inset 0 1px 0 rgba(255,255,255,.9);
-  transition: opacity .3s, transform .3s; animation: bannerIn .65s cubic-bezier(.2,.8,.3,1) both;
+  position: fixed; top: 72px; left: 50%; transform: translateX(-50%); z-index: 30; max-width: 520px; text-align: center;
+  padding: 15px 28px; background: #fff; border: 1px solid var(--line-2, #e4e1d8); border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(16,38,64,.07); transition: opacity .25s, transform .25s; animation: bannerIn .5s ease-out both;
 }
-.intro-banner::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: linear-gradient(180deg, var(--accent, #105194), var(--warm, #f59a2c)); }
-.intro-banner__egg { width: 48px; height: 48px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(16,38,64,.2)); animation: eggBob 3.6s ease-in-out infinite; transform-origin: center bottom; }
-.intro-banner__body { display: flex; flex-direction: column; }
-.intro-banner__eyebrow { align-self: flex-start; margin-bottom: 6px; padding: 3px 10px; border-radius: 20px; background: rgba(16,81,148,.1); color: var(--accent, #105194); }
-.intro-banner__txt { margin: 0; font-size: .96rem; line-height: 1.45; color: var(--ink, #16181c); }
-.intro-banner__txt strong { font-family: var(--font-display, Georgia, serif); font-weight: 700; }
-.intro-banner__txt .kw { color: var(--accent, #105194); }
-@keyframes bannerIn { from { opacity: 0; top: 56px; } to { opacity: 1; top: 72px; } }
-@keyframes eggBob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-5px) rotate(3deg); } }
-html.reduce-motion .intro-banner, html.reduce-motion .intro-banner__egg { animation: none; }
+.intro-banner__eyebrow { display: block; margin-bottom: 8px; }
+.intro-banner__title { margin: 0 0 4px; font-family: var(--font-display, Georgia, serif); font-weight: 700; font-size: 1.3rem; line-height: 1.2; color: var(--ink, #16181c); }
+.intro-banner__title .kw { color: var(--accent, #105194); }
+.intro-banner__txt { margin: 0; font-size: .92rem; line-height: 1.45; color: var(--mute, #6b7180); }
+@keyframes bannerIn { from { opacity: 0; } to { opacity: 1; } }
+html.reduce-motion .intro-banner { animation: none; }
+
+/* fully-reload button (top-right) */
+.topbar__hint { display: none; }
+.reload-btn { position: fixed; top: 16px; right: 18px; z-index: 50; font: inherit; font-size: .82rem; font-weight: 600; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line-2, #e4e1d8); background: #fff; color: var(--ink, #16181c); cursor: pointer; box-shadow: 0 2px 8px rgba(16,38,64,.08); transition: border-color .15s, transform .15s; }
+.reload-btn:hover { border-color: var(--ink, #16181c); transform: translateY(-1px); }
 /* centre console is hidden at home, shown only inside a mode */
 .console { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility .3s; }
 body.in-mode .console { opacity: 1; visibility: visible; pointer-events: auto; }
