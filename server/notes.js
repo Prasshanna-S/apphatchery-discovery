@@ -66,6 +66,6 @@ export async function sendIntakeEmail({ to, subject, markdown }) {
       body: JSON.stringify({ from, to: [to], subject, text: markdown })
     });
     const body = await res.json().catch(() => ({}));
-    return { ok: res.ok, via: "resend", status: res.status, id: body.id || null };
+    return { ok: res.ok, via: "resend", status: res.status, id: body.id || null, error: res.ok ? null : (body.message || body.name || JSON.stringify(body)) };
   } catch (e) { return { ok: false, via: "resend", error: String(e.message || e) }; }
 }
