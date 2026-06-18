@@ -57,12 +57,17 @@ const state = { step: -1, answers: {} };
 
 /* ----------------------------------------------------------------- LAYOUT */
 function computeLayout() {
-  // even angular spacing (→ no overlap) on a ring that clears + surrounds the centre card
-  const n = BOARD_ASSETS.length, cx = TILE.w / 2, cy = TILE.h / 2;
+  // scatter across the WHOLE tile via a shuffled jittered grid → fills the space, no ring
+  const n = BOARD_ASSETS.length;
+  const cols = Math.round(Math.sqrt(n * (TILE.w / TILE.h))) || 1;
+  const rows = Math.ceil(n / cols);
+  const cellW = TILE.w / cols, cellH = TILE.h / rows;
+  const order = BOARD_ASSETS.map((_, i) => i).sort((p, q) => rand(BOARD_ASSETS[p].src + "o") - rand(BOARD_ASSETS[q].src + "o"));
   layout = BOARD_ASSETS.map((a, i) => {
-    const ang = (i / n) * Math.PI * 2 + (rand(a.src) - 0.5) * 0.22;
-    const rad = 0.74 + rand(a.src + "r") * 0.24;
-    return { ...a, x: cx + Math.cos(ang) * rad * TILE.w * 0.44, y: cy + Math.sin(ang) * rad * TILE.h * 0.48, rot: (rand(a.src) - 0.5) * 8 };
+    const slot = order.indexOf(i), col = slot % cols, row = Math.floor(slot / cols);
+    const jx = (rand(a.src + "x") - 0.5) * cellW * 0.66;
+    const jy = (rand(a.src + "y") - 0.5) * cellH * 0.66;
+    return { ...a, x: (col + 0.5) * cellW + jx, y: (row + 0.5) * cellH + jy, rot: (rand(a.src) - 0.5) * 10 };
   });
 }
 function buildTiles() {
@@ -116,7 +121,11 @@ function ambient() {
 function centerWorld() { wx = 0; wy = 0; gsap ? gsap.set(world, { x: 0, y: 0 }) : (world.style.transform = "translate(0,0)"); positionTiles(0, 0); }
 function idleFloat() {
   if (reduced || !gsap) return;
-  document.querySelectorAll(".sticker__img").forEach((img, i) => gsap.to(img, { y: (i % 2 ? -1 : 1) * (5 + (i % 4) * 2), rotation: (i % 2 ? 1 : -1) * 1.3, duration: 2.6 + (i % 5) * 0.4, ease: "sine.inOut", yoyo: true, repeat: -1, delay: (i % 7) * 0.3 }));
+  document.querySelectorAll(".sticker__img").forEach((img, i) => gsap.to(img, {
+    x: (i % 2 ? -1 : 1) * (9 + (i % 5) * 4), y: (i % 3 ? -1 : 1) * (8 + (i % 4) * 4),
+    rotation: (i % 2 ? 1 : -1) * (2 + (i % 3)), duration: 3.4 + (i % 6) * 0.7,
+    ease: "sine.inOut", yoyo: true, repeat: -1, delay: (i % 7) * 0.4
+  }));
 }
 
 /* ----------------------------------------------------------------- HOVER + CLICK */
@@ -348,7 +357,7 @@ async function openTavus(url, conversationId) {
   let call = null;
   const cleanup = () => {
     try { call && call.destroy(); } catch (_) {}
-    if (conversationId) { try { fetch("/api/end-conversation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ conversation_id: conversationId }) }); } catch (_) {} }
+    if (conversationId) { try { fetch("/api/end-conversation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ conversation_id: conversationId, discovery: state.answers, record: { researchArea: state.answers.area || null, intent: state.answers.intent || null } }) }); } catch (_) {} }
     m.hidden = true; m.innerHTML = ""; ackAfterTavus();
   };
   m.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", cleanup));

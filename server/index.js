@@ -15,6 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createConversation, endConversation } from "./tavus.js";
+import { fetchTranscript, synthesizeIntake, sendIntakeEmail } from "./notes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -23,6 +24,21 @@ const leads = [];   // POC store — swap for Notion/Airtable (brief §10 decisi
 const DATA_DIR = path.join(__dirname, "data");
 try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (_) {}
 function saveDoc(prefix, obj) { try { const f = path.join(DATA_DIR, `${prefix}-${Date.now()}.json`); fs.writeFileSync(f, JSON.stringify(obj, null, 2)); console.log("[saved]", path.basename(f)); return f; } catch (_) { return null; } }
+
+/* End-of-call pipeline: transcript → GPT intake report → save locally → email the team. */
+async function finalizeIntake({ conversation_id = null, transcript = null, discovery = {}, record = {} } = {}) {
+  let tx = transcript;
+  if ((!tx || !tx.length) && conversation_id) {            // transcript lands a few seconds after the call ends
+    for (let i = 0; i < 5 && (!tx || !tx.length); i++) { await new Promise(r => setTimeout(r, 2500)); tx = await fetchTranscript(conversation_id); }
+  }
+  const synth = await synthesizeIntake({ transcript: tx || [], discovery, record });
+  const to = process.env.INTAKE_EMAIL_TO || "fprassh@emory.edu";
+  const subject = `AppHatchery intake — ${record.researchArea || discovery.area || discovery.intent || "new inquiry"}`;
+  const email = await sendIntakeEmail({ to, subject, markdown: synth.doc });
+  const file = saveDoc("intake", { kind: "intake", conversation_id, discovery, record, transcriptLines: (tx || []).length, synthesized: synth.ok, reason: synth.reason || null, document: synth.doc, emailedTo: to, email, at: new Date().toISOString() });
+  console.log(`[intake finalised] synth=${synth.ok} email=${email.via}(ok=${email.ok}) → ${file ? path.basename(file) : "?"}`);
+  return { ok: synth.ok, emailed: email.ok, via: email.via, document: synth.doc, file };
+}
 
 const MIME = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".svg": "image/svg+xml", ".ico": "image/x-icon", ".webp": "image/webp", ".woff2": "font/woff2" };
 
@@ -55,8 +71,20 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, { ok: true });
   }
   if (req.method === "POST" && url.pathname === "/api/end-conversation") {
-    try { const b = JSON.parse(await readBody(req) || "{}"); return json(res, 200, await endConversation(b.conversation_id)); }
-    catch (_) { return json(res, 200, { ok: false }); }
+    try {
+      const b = JSON.parse(await readBody(req) || "{}");
+      const ended = await endConversation(b.conversation_id);
+      finalizeIntake({ conversation_id: b.conversation_id, discovery: b.discovery || {}, record: b.record || {} }).catch(e => console.error("[finalize]", e));   // GPT flow runs async
+      return json(res, 200, { ...ended, finalizing: true });
+    } catch (_) { return json(res, 200, { ok: false }); }
+  }
+  if (req.method === "POST" && url.pathname === "/api/finalize") {       // test/trigger the GPT flow directly
+    try { return json(res, 200, await finalizeIntake(JSON.parse(await readBody(req) || "{}"))); }
+    catch (e) { return json(res, 500, { ok: false, error: String(e.message || e) }); }
+  }
+  if (req.method === "GET" && url.pathname === "/api/docs") {            // for the review page
+    try { const files = fs.readdirSync(DATA_DIR).filter(f => f.endsWith(".json")).sort().reverse().slice(0, 60); return json(res, 200, files.map(f => { try { return { file: f, ...JSON.parse(fs.readFileSync(path.join(DATA_DIR, f), "utf8")) }; } catch (_) { return { file: f }; } })); }
+    catch (_) { return json(res, 200, []); }
   }
   if (req.method === "GET" && url.pathname === "/api/leads") return json(res, 200, leads);
 
