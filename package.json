@@ -1,0 +1,11 @@
+{
+  "name": "apphatchery-discovery",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AppHatchery unified Discovery + Intake experience (POC)",
+  "scripts": {
+    "start": "node server/index.js",
+    "setup:persona": "node server/setup-persona.js"
+  }
+}

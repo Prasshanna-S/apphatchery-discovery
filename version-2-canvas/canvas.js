@@ -14,6 +14,7 @@
 
 import CONTENT, { ARTIFACTS, PIPELINE, AUDIENCES, PROBLEM_AREAS } from "../shared/content.js";
 import ROUTER, { QUESTIONS, getOptions, partition, rank } from "../shared/routing.js";
+import INTAKE, { INTAKE_QUESTIONS } from "../shared/intake.js";
 
 const gsap = window.gsap;
 if (gsap) gsap.registerPlugin(...[window.Draggable, window.InertiaPlugin].filter(Boolean));
@@ -246,11 +247,11 @@ function renderResult() {
     <h2 class="qbig">${apps.length ? `Start <span class="kw">here</span>.` : `Let's <span class="kw">build it</span>.`}</h2>
     ${apps.length ? `<div class="appcards">${appCards}</div>` : `<p class="qhelp">What you're describing isn't in our toolkit yet — and that's exactly what AppHatchery loves to help build.</p>`}
     ${papers.length ? `<div class="papers"><span class="mono-label">Related research</span>${paperRows}</div>` : ""}
-    <a class="contactbar" href="${PIPELINE.primaryCta.url}" target="_blank" rel="noopener">
+    <button class="contactbar" id="intakeBtn" type="button">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2z"/></svg>
-      <span class="contactbar__txt"><strong>Have an idea of your own?</strong><span>Talk to the team that builds these.</span></span>
-      <span class="contactbar__go">Contact us →</span>
-    </a>
+      <span class="contactbar__txt"><strong>Have an idea of your own?</strong><span>Talk it through with the team.</span></span>
+      <span class="contactbar__go">Start a project →</span>
+    </button>
     <div class="resfoot"><button class="ghostlink" id="seeAllBtn">View everything</button><button class="ghostlink" id="restartBtn">↺ Start over</button></div>`;
   consoleEl.querySelectorAll(".appcard, .paperrow").forEach(c => {
     c.addEventListener("click", () => { const a = ARTIFACTS.find(x => x.id === c.dataset.id); if (a) openDetail(a); });
@@ -259,11 +260,196 @@ function renderResult() {
   });
   consoleEl.querySelector("#restartBtn").addEventListener("click", reset);
   consoleEl.querySelector("#seeAllBtn").addEventListener("click", () => toggleSimplified(true));
+  consoleEl.querySelector("#intakeBtn")?.addEventListener("click", renderHandoff);
   applyReceding();
   if (gsap && !reduced) gsap.from(consoleEl.querySelectorAll(".appcard, .paperrow, .qbig, .contactbar"), { y: 12, autoAlpha: 0, duration: 0.4, stagger: 0.05, ease: "power3.out" });
   announce(apps.length ? `${apps.length} apps and ${papers.length} papers matched.` : "A new idea — let's build it together.");
 }
 function reset() { exitFocused(); renderIntro(); applyReceding(); }
+
+/* ===================== UNIFIED PIPELINE — discovery → intake (Tavus + chip fallback) ===================== */
+const TAVUS_TEAM_NAME = "the team";   // TODO: real AH member once decided (brief §10)
+function discoveryBits() {
+  const who = state.answers.who ? (AUDIENCES[state.answers.who]?.short || state.answers.who) : null;
+  const area = state.answers.area ? (PROBLEM_AREAS[state.answers.area] || null) : null;
+  return [who, area].filter(Boolean);
+}
+function renderHandoff() {
+  consoleEl.className = "console console--intake";
+  const bits = discoveryBits();
+  const ctx = bits.length
+    ? `Based on what you told us — <strong>${escapeHtml(bits.join(" · "))}</strong>. We won't ask again.`
+    : `Tell us a little about your project and we'll route it to the right person.`;
+  consoleEl.innerHTML = `
+    <span class="mono-label">Start a project</span>
+    <h2 class="qbig">Let's <span class="kw">talk it through</span>.</h2>
+    <p class="qhelp">${ctx}</p>
+    <div class="handoff">
+      <button class="handoff__opt handoff__opt--video" id="hoVideo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11z"/></svg>
+        <span class="handoff__txt"><strong>Talk to ${escapeHtml(TAVUS_TEAM_NAME)} now</strong><span>A short live conversation, right here</span></span>
+        <span class="handoff__go">→</span>
+      </button>
+      <button class="handoff__opt" id="hoChips">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 6h16v2H4zM4 11h16v2H4zM4 16h10v2H4z"/></svg>
+        <span class="handoff__txt"><strong>Answer 3 quick questions</strong><span>Prefer to tap, not talk</span></span>
+        <span class="handoff__go">→</span>
+      </button>
+      <a class="handoff__opt handoff__opt--mail" href="mailto:${INTAKE.ACK.directLine}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 4 8 5 8-5"/></svg>
+        <span class="handoff__txt"><strong>Just email us</strong><span>${escapeHtml(INTAKE.ACK.directLine)}</span></span>
+      </a>
+    </div>
+    <button class="ghostlink" id="hoBack">← back to results</button>`;
+  consoleEl.querySelector("#hoVideo").addEventListener("click", startTavus);
+  consoleEl.querySelector("#hoChips").addEventListener("click", () => { state.intake = {}; renderIntakeQuestion(0); });
+  consoleEl.querySelector("#hoBack").addEventListener("click", renderResult);
+}
+async function startTavus() {
+  const btn = consoleEl.querySelector("#hoVideo");
+  if (btn) { btn.classList.add("is-loading"); btn.querySelector(".handoff__go").textContent = "…"; }
+  const r = rank(state.answers, { limit: 6 });
+  try {
+    const res = await fetch("/api/start-conversation", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ discovery: state.answers, matchedArtifacts: r.matches.map(m => m.artifact.id) })
+    });
+    if (!res.ok) throw new Error("conversation unavailable");
+    const data = await res.json();
+    if (!data.conversation_url) throw new Error("no conversation_url");
+    openTavus(data.conversation_url, data.conversation_id);
+  } catch (_) {
+    // graceful fallback — live video not configured (no TAVUS_API_KEY) → chip survey
+    state.intake = {}; renderIntakeQuestion(0);
+    announce("Live video isn't available right now — a few quick questions instead.");
+  }
+}
+function loadDaily() {
+  return new Promise((resolve, reject) => {
+    if (window.Daily) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://unpkg.com/@daily-co/daily-js"; s.crossOrigin = "anonymous";
+    s.onload = resolve; s.onerror = reject; document.head.appendChild(s);
+  });
+}
+async function openTavus(url, conversationId) {
+  let m = document.getElementById("tavus");
+  if (!m) { m = document.createElement("div"); m.id = "tavus"; m.className = "tavus"; document.body.appendChild(m); }
+  m.innerHTML = `<div class="tavus__backdrop" data-close></div>
+    <div class="tavus__panel"><button class="detail__close" data-close aria-label="End conversation">✕</button>
+      <div id="tavusCall" class="tavus__frame"></div></div>`;
+  m.hidden = false;
+  let call = null;
+  const cleanup = () => { try { call && call.destroy(); } catch (_) {} m.hidden = true; m.innerHTML = ""; };
+  m.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", cleanup));
+  try {
+    await loadDaily();
+    call = window.Daily.createFrame(document.getElementById("tavusCall"), { iframeStyle: { width: "100%", height: "100%", border: "0" }, showLeaveButton: true });
+    call.on("app-message", e => handleTavusMessage(e, call, conversationId));
+    call.on("left-meeting", cleanup);
+    await call.join({ url });
+  } catch (_) {
+    const slot = document.getElementById("tavusCall");   // Daily unavailable → plain iframe (avatar + warm context still work)
+    if (slot) slot.outerHTML = `<iframe class="tavus__frame" src="${url}" allow="camera; microphone; autoplay; fullscreen" title="Talk to the AppHatchery team"></iframe>`;
+  }
+}
+/* The routing brain, answered live as Tavus tool calls — the discovery engine INSIDE the conversation. */
+function handleTavusMessage(e, call, conversationId) {
+  const msg = e && e.data; if (!msg || msg.event_type !== "conversation.tool_call") return;
+  const name = msg.properties && msg.properties.name;
+  let args = {}; try { args = JSON.parse((msg.properties && msg.properties.arguments) || "{}"); } catch (_) {}
+  if (name === "match_portfolio") {
+    const ans = { ...state.answers };
+    const map = { researcher: "researcher", clinician: "clinician", patient: "caregiver", public_health: "publicHealth" };
+    if (args.audience && map[args.audience]) ans.who = map[args.audience];
+    const r = rank(ans, { limit: 3 });
+    const text = r.matches.length
+      ? "From our portfolio: " + r.matches.map(({ artifact: a }) => `${a.title} — ${a.tagline || ""}`).join("; ") + "."
+      : "Nothing in the current toolkit is an exact match — this sounds like a new build worth the team's time.";
+    sendTavus(call, conversationId, "respond", text);
+  } else if (name === "capture_intake_record") {
+    const r = rank(state.answers, { limit: 6 });
+    const rec = INTAKE.buildLeadRecord({
+      discovery: state.answers, matches: r.matches.map(m => m.artifact),
+      intake: { stage: args.project_stage, funding: args.funding_status, timeline: args.timeline },
+      contact: { name: args.researcher_name, email: args.email, note: args.problem_description, source: "tavus" }
+    });
+    INTAKE.submitLead(rec);
+    sendTavus(call, conversationId, "echo", "Perfect — your details are with the team now. You'll hear from a person soon.");
+  }
+}
+function sendTavus(call, conversationId, kind, text) {
+  try {
+    call.sendAppMessage({
+      message_type: "conversation", event_type: `conversation.${kind}`, conversation_id: conversationId,
+      properties: kind === "echo" ? { modality: "text", text, done: true } : { text }
+    }, "*");
+  } catch (_) {}
+}
+function renderIntakeQuestion(i) {
+  const q = INTAKE_QUESTIONS[i], L = "abcdefgh";
+  consoleEl.className = "console console--intake";
+  consoleEl.innerHTML = `
+    <div class="console__head"><span class="mono-label">Start a project · ${i + 1}/${INTAKE_QUESTIONS.length}</span>
+      <button class="ghostlink" id="iBack">← back</button></div>
+    <h2 class="qbig">${formatQ(q.prompt)}</h2>
+    <div class="chips">${q.options.map((o, j) => `<button class="chip" data-val="${o.id}"><span class="chip__k">${L[j]}</span>${escapeHtml(o.label)}</button>`).join("")}</div>`;
+  consoleEl.querySelectorAll(".chip[data-val]").forEach(b => b.addEventListener("click", () => {
+    state.intake[q.id] = b.dataset.val;
+    (i < INTAKE_QUESTIONS.length - 1) ? renderIntakeQuestion(i + 1) : renderIntakeDetails();
+  }));
+  consoleEl.querySelector("#iBack").addEventListener("click", () => i === 0 ? renderHandoff() : renderIntakeQuestion(i - 1));
+  if (gsap && !reduced) gsap.from(consoleEl.querySelector(".qbig"), { y: 12, autoAlpha: 0, duration: 0.35, ease: "power3.out" });
+}
+function renderIntakeDetails() {
+  consoleEl.className = "console console--intake";
+  consoleEl.innerHTML = `
+    <span class="mono-label">Almost there</span>
+    <h2 class="qbig">Where do we <span class="kw">reach you</span>?</h2>
+    <p class="qhelp">Optional — leave an email and we'll follow up. You'll get a confirmation either way.</p>
+    <div class="intake-form">
+      <input class="field" id="iName" type="text" placeholder="Name (optional)" autocomplete="name" />
+      <input class="field" id="iEmail" type="email" placeholder="Email (optional)" autocomplete="email" />
+      <textarea class="field" id="iNote" rows="2" placeholder="Anything you'd like the team to know? (optional)"></textarea>
+    </div>
+    <div class="intake-actions">
+      <button class="chip chip--go" id="iSend">Send to the team →</button>
+      <button class="ghostlink" id="iBack2">← back</button>
+    </div>`;
+  consoleEl.querySelector("#iSend").addEventListener("click", submitIntake);
+  consoleEl.querySelector("#iBack2").addEventListener("click", () => renderIntakeQuestion(INTAKE_QUESTIONS.length - 1));
+}
+async function submitIntake() {
+  const r = rank(state.answers, { limit: 6 });
+  const contact = {
+    name: consoleEl.querySelector("#iName")?.value.trim() || null,
+    email: consoleEl.querySelector("#iEmail")?.value.trim() || null,
+    note: consoleEl.querySelector("#iNote")?.value.trim() || null,
+    source: "discovery-canvas"
+  };
+  const record = INTAKE.buildLeadRecord({ discovery: state.answers, matches: r.matches.map(m => m.artifact), intake: state.intake, contact });
+  const btn = consoleEl.querySelector("#iSend"); if (btn) { btn.disabled = true; btn.textContent = "Sending…"; }
+  const res = await INTAKE.submitLead(record);
+  renderConfirmation(res, r);
+}
+function renderConfirmation(res, r) {
+  consoleEl.className = "console console--confirm";
+  const recs = (r?.matches || []).slice(0, 3).map(({ artifact: a }) =>
+    `<a class="confirm-link" href="${a.url || a.secondaryUrls?.iosAppStore || a.secondaryUrls?.paper || ORG_SITE}" target="_blank" rel="noopener">${escapeHtml(a.title)} →</a>`).join("");
+  consoleEl.innerHTML = `
+    <div class="confirm-tick" aria-hidden="true">✓</div>
+    <span class="mono-label">Received</span>
+    <h2 class="qbig">${escapeHtml(INTAKE.ACK.title)}</h2>
+    <p class="qhelp">${escapeHtml(INTAKE.ACK.body)}</p>
+    ${recs ? `<div class="confirm-recs"><span class="mono-label">While you wait — relevant to you</span><div class="confirm-recs__links">${recs}</div></div>` : ""}
+    <div class="resfoot">
+      ${res && res.mailto ? `<a class="ghostlink" href="${res.mailto}">Send a copy by email</a>` : ""}
+      <button class="ghostlink" id="cRestart">↺ Start over</button>
+    </div>`;
+  consoleEl.querySelector("#cRestart").addEventListener("click", reset);
+  if (gsap && !reduced) gsap.from(consoleEl.querySelectorAll(".confirm-tick, .qbig, .qhelp, .confirm-recs, .resfoot"), { y: 12, autoAlpha: 0, duration: 0.4, stagger: 0.06, ease: "power3.out" });
+  announce(INTAKE.ACK.title + " " + INTAKE.ACK.body);
+}
 
 /* ----------------------------------------------------------------- STATES (GSAP) */
 function tweenSticker(el, props) { if (gsap) gsap.to(el, { duration: 0.5, ease: "power3.out", overwrite: "auto", ...props }); }
