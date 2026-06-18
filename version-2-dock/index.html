@@ -48,7 +48,13 @@
         </span>
       </header>
 
-      <!-- THE CONSOLE: the guided discovery flow. Light card. Injected by canvas.js -->
+      <!-- PERSISTENT INTRO (top, small) — hides when a mode opens -->
+      <div class="intro-banner" id="introBanner">
+        <span class="intro-banner__eyebrow mono-label">Digital health, built for research</span>
+        <p class="intro-banner__txt"><strong>This is AppHatchery.</strong> Health-tech ideas, from first sketch to a launched, studied app.</p>
+      </div>
+
+      <!-- THE CONSOLE: mode surface (guide / contact / result). Hidden at home. Injected by canvas.js -->
       <section class="console" id="console" aria-label="Discovery guide"></section>
 
       <!-- ALWAYS-ON PIPELINE: never disperses -->

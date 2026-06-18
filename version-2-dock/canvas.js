@@ -191,22 +191,14 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !detailEl.
 function stepper(active) { return `<ol class="stepper" aria-hidden="true">${QUESTIONS.map((_, i) => `<li class="${i === active ? "on" : ""} ${i < active ? "done" : ""}">${i + 1}</li>`).join("")}</ol>`; }
 function minimizeConsole(on) { document.body.classList.toggle("q-explore", on); }
 
-function showConsole() { document.body.classList.remove("roam"); }
-function hideConsole() { document.body.classList.add("roam"); exitFocused(); announce("Exploring freely — drag the board, or use the dock to get guided, talk to us, or reach the team."); }
-function renderIntro() {
+function showConsole() { document.body.classList.add("in-mode"); }
+function hideConsole() { document.body.classList.remove("in-mode"); exitFocused(); }
+function renderIntro() {   // home state — the intro lives in the fixed top banner; centre console is hidden
   state.step = -1; state.answers = {}; focused = false;
-  document.body.classList.remove("q-explore", "is-result", "is-focused", "roam");
-  consoleEl.className = "console console--welcome";
-  consoleEl.innerHTML = `
-    <span class="mono-label">Digital health, built for research</span>
-    <h1 class="qbig">This is <span class="kw">AppHatchery</span>.</h1>
-    <p class="qhelp">We take health-tech ideas from first sketch to a launched, studied app — find the one we've built for your work, or start a new one with our team.</p>
-    <div class="welcome-actions">
-      <button class="chip chip--go" id="exploreBtn">Explore freely <span aria-hidden="true">→</span></button>
-      <span class="welcome-hint">…or pick a path from the dock below ↓</span>
-    </div>`;
-  consoleEl.querySelector("#exploreBtn").addEventListener("click", hideConsole);
-  announce("AppHatchery — digital health, built for research.");
+  document.body.classList.remove("in-mode", "q-explore", "is-result", "is-focused");
+  setDockActive("about");
+  applyReceding();
+  announce("AppHatchery — digital health, built for research. Explore the board, or pick a path from the dock.");
 }
 function renderQuestion(i) {
   const q = QUESTIONS[i], opts = getOptions(q.id, state.answers), L = "abcdefgh";
@@ -273,7 +265,7 @@ function renderResult() {
   });
   consoleEl.querySelector("#restartBtn").addEventListener("click", reset);
   consoleEl.querySelector("#seeAllBtn").addEventListener("click", () => toggleSimplified(true));
-  consoleEl.querySelector("#intakeBtn")?.addEventListener("click", renderHandoff);
+  consoleEl.querySelector("#intakeBtn")?.addEventListener("click", openContact);
   applyReceding();
   if (gsap && !reduced) gsap.from(consoleEl.querySelectorAll(".appcard, .paperrow, .qbig, .contactbar"), { y: 12, autoAlpha: 0, duration: 0.4, stagger: 0.05, ease: "power3.out" });
   announce(apps.length ? `${apps.length} apps and ${papers.length} papers matched.` : "A new idea — let's build it together.");
@@ -287,7 +279,7 @@ function discoveryBits() {
   const area = state.answers.area ? (PROBLEM_AREAS[state.answers.area] || null) : null;
   return [who, area].filter(Boolean);
 }
-function openContact() { showConsole(); document.body.classList.remove("q-explore"); enterFocused(); renderHandoff(); }
+function openContact() { showConsole(); document.body.classList.remove("q-explore"); enterFocused(); state.intake = {}; renderIntakeDetails(); }
 function renderHandoff() {
   consoleEl.className = "console console--intake";
   const bits = discoveryBits();
@@ -334,7 +326,7 @@ async function startTavus() {
     openTavus(data.conversation_url, data.conversation_id);
   } catch (_) {
     // graceful fallback — live video not configured (no TAVUS_API_KEY) → chip survey
-    showConsole(); enterFocused(); state.intake = {}; renderIntakeQuestion(0);
+    showConsole(); enterFocused(); state.intake = {}; renderIntakeDetails();
     announce("Live video isn't available right now — a few quick questions instead.");
   }
 }
@@ -351,8 +343,14 @@ async function openTavus(url, conversationId) {
   let m = document.getElementById("tavus");
   if (!m) { m = document.createElement("div"); m.id = "tavus"; m.className = "tavus"; document.body.appendChild(m); }
   m.innerHTML = `<div class="tavus__backdrop" data-close></div>
-    <div class="tavus__panel"><button class="detail__close" data-close aria-label="End conversation">✕</button>
-      <div id="tavusCall" class="tavus__frame"></div></div>`;
+    <div class="tavus__panel">
+      <div class="tavus__head">
+        <span class="tavus__live"><span class="live-dot"></span> Live · AppHatchery team</span>
+        <button class="tavus__end" data-close type="button">End conversation</button>
+      </div>
+      <div id="tavusCall" class="tavus__frame"></div>
+      <div class="tavus__foot">Ending the call sends your intake summary to the team.</div>
+    </div>`;
   m.hidden = false;
   let call = null;
   const cleanup = () => {
@@ -544,7 +542,7 @@ const GLYPH = {
   motion:   `<path fill="currentColor" d="M13 2 4 14h6l-1 8 9-12h-6z"/>`
 };
 const DOCK_NAV = [
-  { id: "about",   label: "About",      action: () => { setDockActive("about"); renderIntro(); } },
+  { id: "about",   label: "Explore",    action: () => { renderIntro(); } },
   { id: "guide",   label: "Guide",      action: () => { setDockActive("guide"); showConsole(); enterFocused(); goToStep(0); } },
   { id: "talk",    label: "Talk to us", action: () => { setDockActive("talk"); showConsole(); enterFocused(); startTavus(); } },
   { id: "contact", label: "Contact",    action: () => { setDockActive("contact"); openContact(); } },
