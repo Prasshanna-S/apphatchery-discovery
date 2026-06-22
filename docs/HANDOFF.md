@@ -83,7 +83,7 @@ localStorage + a prefilled `mailto`.
   stickers/dock/topbar (+ banner opacity). The intro banner also centres via `translateX(-50%)` —
   its entrance animates **opacity only** for the same reason.
 - **Resend free tier** only sends to the **account-owner email** without a verified domain.
-  It works because the account was created with `fprassh@emory.edu`. To send elsewhere, verify a domain.
+  It works when the Resend account is created with the recipient address. To send elsewhere, verify a domain.
 - **Tavus live avatar needs a real browser + camera/mic.** Playwright headless creates the
   conversation but won't render the avatar — verify the video by hand in Chrome.
 - **Playwright `evaluate`-clicks race the load/reveal.** Guard on element existence, or take a
@@ -114,7 +114,7 @@ Airtable · acknowledgment-email legal review · Emory comms sign-off.
 A gitignored `.env` (recreate from `server/.env.example`) holds:
 `TAVUS_API_KEY`, `TAVUS_PERSONA_ID` (created via `npm run setup:persona`),
 `TAVUS_REPLICA_ID` (stock `r90bbd427f71`), `OPENAI_API_KEY`, `OPENAI_MODEL` (`gpt-4o-mini`),
-`RESEND_API_KEY`, `INTAKE_EMAIL_TO` (`fprassh@emory.edu`). **No key values are committed.**
+`RESEND_API_KEY`, `INTAKE_EMAIL_TO` (the report recipient). **No key values are committed.**
 If keys were shared in chat during the build, rotate them as good practice.
 
 ## 9. How to extend (common tasks)

@@ -466,7 +466,7 @@ export const ARTIFACTS = [
 /** People — for trust signals (credentials + affiliation matter for this audience). */
 export const PEOPLE = [
   { id: "lam", name: "Wilbur Lam, MD, PhD", role: "Program Director / PI", org: "Emory University & Georgia Tech", note: "National Academy of Medicine 2023 Fellow." },
-  { id: "greenleaf", name: "Morgan Greenleaf", role: "Director — Apps, Digital Platforms & Technology Development", org: "AppHatchery / Emory", contact: "morgan.greenleaf@emory.edu", note: "Also Scientific Director, XR Innovation Center. 2024 Georgia CTSA Innovation Award." },
+  { id: "greenleaf", name: "Morgan Greenleaf", role: "Director — Apps, Digital Platforms & Technology Development", org: "AppHatchery / Emory", note: "Also Scientific Director, XR Innovation Center. 2024 Georgia CTSA Innovation Award." },
   { id: "arconada", name: "Santiago Arconada Alvarez, MS", role: "Co-Founder & Associate Director of Apps", org: "AppHatchery / Emory", note: "NIH R50 RSE awardee (2026); creator of Fabla & HerHeart; founder of VocalisCare; 2024 Emory IDEAward.", portfolio: "https://yagoarconada.com" },
   { id: "kaplan", name: "Dr. Deanna Kaplan, PhD", role: "Fabla creator / PI (partner-investigator)", org: "Emory SOM — Spiritual Health & Preventive Medicine; HEAT Lab", note: "Genomic Press 2025 Rising Star." }
 ];
@@ -489,7 +489,7 @@ export const PIPELINE = {
   primaryCta: { label: "Get in touch", url: "https://apphatchery.org/contact" },
   email: "info@apphatchery.org",
   support: "Support@apphatchery.org",
-  directContact: { name: "Morgan Greenleaf", email: "morgan.greenleaf@emory.edu" },
+  directContact: { name: "AppHatchery team", email: "info@apphatchery.org" },
   officeHours: "Monthly Office Hours (with a free app raffle for researchers with a health-app idea)",
   accent: BRAND.orange,
   asset: { sticker: "assets/stickers/pipeline.svg", mascot: null, screen: null }

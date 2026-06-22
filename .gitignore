@@ -6,6 +6,7 @@ dist/
 .playwright-mcp/
 .env
 .env.*
+!server/.env.example
 
 # runtime intake output
 server/data/

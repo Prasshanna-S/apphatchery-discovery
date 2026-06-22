@@ -32,7 +32,7 @@ async function finalizeIntake({ conversation_id = null, transcript = null, disco
     for (let i = 0; i < 5 && (!tx || !tx.length); i++) { await new Promise(r => setTimeout(r, 2500)); tx = await fetchTranscript(conversation_id); }
   }
   const synth = await synthesizeIntake({ transcript: tx || [], discovery, record });
-  const to = process.env.INTAKE_EMAIL_TO || "fprassh@emory.edu";
+  const to = process.env.INTAKE_EMAIL_TO || "info@apphatchery.org";
   const subject = `AppHatchery intake — ${record.researchArea || discovery.area || discovery.intent || "new inquiry"}`;
   const email = await sendIntakeEmail({ to, subject, markdown: synth.doc });
   const file = saveDoc("intake", { kind: "intake", conversation_id, discovery, record, transcriptLines: (tx || []).length, synthesized: synth.ok, reason: synth.reason || null, document: synth.doc, emailedTo: to, email, at: new Date().toISOString() });

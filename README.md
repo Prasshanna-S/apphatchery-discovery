@@ -76,7 +76,7 @@ npm start                          # serves the app + the /api pipeline on :8000
 | `TAVUS_REPLICA_ID` | defaults to a stock replica (`r90bbd427f71`) — no recording needed |
 | `OPENAI_API_KEY` | GPT intake-report synthesis (`OPENAI_MODEL` defaults to `gpt-4o-mini`) |
 | `RESEND_API_KEY` | email delivery (free tier; sign up with the recipient address) |
-| `INTAKE_EMAIL_TO` | report recipient (e.g. `fprassh@emory.edu`) |
+| `INTAKE_EMAIL_TO` | report recipient — your team inbox (set in `.env`) |
 | `PUBLIC_URL` | optional https tunnel for Tavus webhooks (transcript is also fetched on-demand, so optional locally) |
 
 See `server/README.md` for the server details.
@@ -145,7 +145,7 @@ docs/                    PRESENTATION.md, SYSTEM-AND-SCALING.md, HANDOFF.md
 - Discovery → matched apps; chip intake → confirmation → **record persisted server-side**.
 - Tavus: live conversation **created** (real `conversation_url`), **ended** cleanly (200).
 - GPT report **generated** from a transcript (accurate, structured) and **saved**.
-- Email **delivered** via Resend (real message ids) to `fprassh@emory.edu`.
+- Email **delivered** via Resend (real message ids) to the configured `INTAKE_EMAIL_TO`.
 - Front-end flows driven + screenshotted; server backbone exercised via the `/api` routes.
 
 ## Safe points (git tags)
